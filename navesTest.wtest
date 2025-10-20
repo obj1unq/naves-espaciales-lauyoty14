@@ -26,6 +26,10 @@ describe "Nave de carga" {
 		assert.equals(0, naveVacia.carga())
 	}
 
+	test "propulsarse" {
+		naveVacia.propulsar()
+		assert.equals(20000, naveVacia.velocidad())
+	}
 }
 
 describe "Nave de pasajeros" {
@@ -54,10 +58,26 @@ describe "Nave de pasajeros" {
 		assert.that(naveSinPasajeros.alarma())
 	}
 
+	test "propulsarse" {
+		naveSinPasajeros.velocidad(290000)
+		naveSinPasajeros.propulsar()
+		assert.equals(300000, naveSinPasajeros.velocidad())
+	}
+
+	test "viajar" {
+		naveConPasajeros.prepararParaViajar()
+		assert.equals(300000, naveConPasajeros.velocidad())
+	}
+
+	test "encuentra enemigo" {
+		naveConPasajeros.velocidad(0)
+		naveConPasajeros.encuentraUnEnemigo()
+		assert.equals(20000, naveConPasajeros.velocidad())
+		assert.that(naveConPasajeros.alarma())
+	}
 }
 
 describe "Nave de combate" {
-
 	const naveEnReposo = new NaveDeCombate()
 	const naveEnAtaque = new NaveDeCombate(modo = ataque)
 
@@ -82,5 +102,34 @@ describe "Nave de combate" {
 	test "recibir amenaza en ataque" {
 		naveEnAtaque.recibirAmenaza()
 		assert.equals("Enemigo encontrado", naveEnAtaque.ultimoMensaje())
+	}
+
+	test "viajar en ataque" {
+		naveEnAtaque.prepararParaViajar()
+		assert.equals("Volviendo a la base", naveEnAtaque.mensajesEmitidos().first())
+		assert.equals(15000, naveEnAtaque.velocidad())
+	}
+
+	test "viajar en reposo" {
+		naveEnReposo.prepararParaViajar()
+		assert.equals("Saliendo en mision", naveEnReposo.mensajesEmitidos().first())
+		assert.equals(15000, naveEnReposo.velocidad())
+		assert.equals(ataque, naveEnReposo.modo())
+	}
+}
+
+describe "Nave de carga con residuos" {  
+	const naveDeCargaConResiduos = new NaveDeCargaConResiduos()
+	test "recibe amenaza" {
+		naveDeCargaConResiduos.carga(5000)
+		naveDeCargaConResiduos.velocidad(10000)
+		naveDeCargaConResiduos.estaSellada(true)
+		assert.equals(5000, naveDeCargaConResiduos.carga())
+	}
+
+	test "viajar" {
+		naveDeCargaConResiduos.prepararParaViajar()
+		assert.equals(15000, naveDeCargaConResiduos.velocidad())
+		assert.that(naveDeCargaConResiduos.estaSellada())
 	}
 }
